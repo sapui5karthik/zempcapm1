@@ -1,30 +1,95 @@
 _schema-version: 3.3.0
 ID: zempcapm1
+description: A simple CAP project.
 version: 1.0.0
-description: "A simple CAP project."
+modules:
+- name: zempcapm1-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: zempcapm1-auth
+  - name: zempcapm1-db
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    instances: 1
+  build-parameters:
+    builder: npm-ci
+- name: zempcapm1-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: zempcapm1-db
+  parameters:
+    buildpack: nodejs_buildpack
+- name: zempcapm1-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: zempcapm1-destination-service
+    parameters:
+      content-target: true
+  - name: zempcapm1_html_repo_host
+    parameters:
+      service-key:
+        name: zempcapm1_html_repo_host-key
+  - name: zempcapm1-auth
+    parameters:
+      service-key:
+        name: zempcapm1-auth-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: zempcapm1approuter_zempcapm1_html_repo_host
+          ServiceInstanceName: zempcapm1-html5-app-host-service
+          ServiceKeyName: zempcapm1_html_repo_host-key
+          sap.cloud.service: zempcapm1approuter
+        - Authentication: OAuth2UserTokenExchange
+          Name: zempcapm1approuter_zempcapm1_auth
+          ServiceInstanceName: zempcapm1-auth
+          ServiceKeyName: zempcapm1-auth-key
+          sap.cloud.service: zempcapm1approuter
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+resources:
+- name: zempcapm1-auth
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      tenant-mode: dedicated
+      xsappname: zempcapm1-${org}-${space}
+    path: ./xs-security.json
+    service: xsuaa
+    service-plan: application
+- name: zempcapm1-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+- name: zempcapm1-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      version: 1.0.0
+    service: destination
+    service-name: zempcapm1-destination-service
+    service-plan: lite
+- name: zempcapm1_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: zempcapm1-html5-app-host-service
+    service-plan: app-host
 parameters:
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm ci
-        - npx cds build --production
-modules:
-  - name: zempcapm1-srv
-    type: nodejs
-    path: gen/srv
-    parameters:
-      instances: 1
-      buildpack: nodejs_buildpack
-    build-parameters:
-      builder: npm-ci
-    provides:
-      - name: srv-api # required by consumers of CAP services (e.g. approuter)
-        properties:
-          srv-url: ${default-url}
-    requires:
-      []
-
-resources:
-  []
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production
