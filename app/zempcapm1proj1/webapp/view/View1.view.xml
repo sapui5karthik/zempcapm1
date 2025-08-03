@@ -7,7 +7,7 @@
          parameters: {
            $$updateGroupId: 'auto',
            $$groupId: 'auto'
-         }}" growing="true" growingScrollToLoad="false" growingThreshold="10" >
+         }}" growing="true" growingScrollToLoad="false" growingThreshold="10" mode="SingleSelectLeft"  selectionChange="onSelectRow"> 
             <columns>
                 <Column>
                     <Text text="EMPID" />
@@ -18,7 +18,7 @@
               
             </columns>    
             <items>
-                <ColumnListItem>
+                <ColumnListItem >
                     <cells>
                         <Text text="{emp>empid}" />
                         <Text text="{emp>empname}" />
@@ -27,12 +27,12 @@
                 </ColumnListItem>
             </items>
 </Table>
-<VBox class="sapUiSmallMargin">
+<VBox class="sapUiSmallMargin" id="idcrudform">
         <Label text="Employee ID" />
-        <Input id="idEmpid" value="{/ZEMPID}" width="100px"/>
+        <Input id="idEmpid"  width="100px"/>
 
         <Label text="Employee Name" />
-        <Input id="idEmpname" value="{/ZEMPNAME}" width="100px"/>
+        <Input id="idEmpname"  width="100px"/>
 
         <HBox class="sapUiSmallMarginTop">
             <Button text="Create" press="onCreate" type="Emphasized" />

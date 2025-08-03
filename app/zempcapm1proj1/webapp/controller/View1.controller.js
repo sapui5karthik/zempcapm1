@@ -37,21 +37,49 @@ sap.ui.define([
             });           
             oModel.submitBatch("createGroup").then(() => {
                 sap.m.MessageToast.show("Employee created successfully");            
-                this.byId("idEmpTable").bindItems({
-                    path: "/ReadEmp",
-                    template: new sap.m.ColumnListItem({
-                        cells: [
-                            new sap.m.Text({ text: "{empid}" }),
-                            new sap.m.Text({ text: "{empname}" })
-                        ]
-                    })
-                });
-             
+               this.onInit();
+
+             this.byId("idEmpid").setValue();
+            this.byId("idEmpname").setValue();
             }).catch((err) => {
                 sap.m.MessageBox.error("Creation failed: " + err.message);
             });
 
 
+        },
+        onSelectRow : function(oEvent){
+            const oSelectedItem = oEvent.getParameter("listItem"); // The selected row (ColumnListItem)
+            const oContext = oSelectedItem.getBindingContext("emp");    // Context of selected row
+            const oData = oContext.getObject();                    // Actual row data
+        
+            // Example usage
+            const empId = oData.empid;
+            const empName = oData.empname;
+        
+            // Optional: Set values in form fields
+            this.byId("idEmpid").setValue(empId);
+            this.byId("idEmpname").setValue(empName);
+                      
+
+        },
+        onUpdate : function(){
+            const oModel = this.getOwnerComponent().getModel(); // OData V4 model
+
+            const sEmpid = this.byId("idEmpid").getValue();  
+             const sPath = `/ReadEmp('${sEmpid}')`;   
+           oModel.bindContext(sPath, undefined, {
+                $$updateGroupId: "updateGroup"
+            });
+             oModel.submitBatch("updateGroup")
+                .then(() => {
+                    sap.m.MessageToast.show("Employee updated successfully");
+                    this.onInit();
+                    this.byId("idEmpid").setValue();
+            this.byId("idEmpname").setValue();
+                })
+                .catch((err) => {
+                    sap.m.MessageBox.error("Update failed: " + err.message);
+                });
         },
       
           
