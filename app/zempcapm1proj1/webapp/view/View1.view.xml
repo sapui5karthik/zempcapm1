@@ -1,0 +1,45 @@
+<mvc:View controllerName="zempcapm1proj1.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+    <content>
+       <Table id="idEmpTable" items="{path:'emp>/',
+         parameters: {
+           $$updateGroupId: 'auto',
+           $$groupId: 'auto'
+         }}" growing="true" growingScrollToLoad="false" growingThreshold="10" >
+            <columns>
+                <Column>
+                    <Text text="EMPID" />
+                </Column>   
+                <Column>
+                    <Text text="EMPNAME" />
+                </Column>
+              
+            </columns>    
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{emp>empid}" />
+                        <Text text="{emp>empname}" />
+                       
+                    </cells>
+                </ColumnListItem>
+            </items>
+</Table>
+<VBox class="sapUiSmallMargin">
+        <Label text="Employee ID" />
+        <Input id="idEmpid" value="{/ZEMPID}" width="100px"/>
+
+        <Label text="Employee Name" />
+        <Input id="idEmpname" value="{/ZEMPNAME}" width="100px"/>
+
+        <HBox class="sapUiSmallMarginTop">
+            <Button text="Create" press="onCreate" type="Emphasized" />
+            <Button text="Update" press="onUpdate" class="sapUiTinyMarginBegin" />
+        </HBox>
+    </VBox>
+
+    </content>
+    </Page>
+</mvc:View>

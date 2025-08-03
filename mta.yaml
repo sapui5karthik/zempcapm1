@@ -55,6 +55,30 @@ modules:
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
+- name: zempcapm1-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: zempcapm1_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - zempcapm1proj1.zip
+      name: zempcapm1proj1
+      target-path: resources/
+- name: zempcapm1proj1
+  type: html5
+  path: app/zempcapm1proj1
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
 resources:
 - name: zempcapm1-auth
   type: org.cloudfoundry.managed-service
@@ -75,10 +99,28 @@ resources:
   parameters:
     config:
       HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
+          existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: zempcapm1-destination-service
     service-plan: lite
+  requires:
+  - name: srv-api
 - name: zempcapm1_html_repo_host
   type: org.cloudfoundry.managed-service
   parameters:
@@ -86,6 +128,7 @@ resources:
     service-name: zempcapm1-html5-app-host-service
     service-plan: app-host
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:

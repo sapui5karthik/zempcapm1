@@ -1,0 +1,1 @@
+using catser as service from '../../srv/catserv';
